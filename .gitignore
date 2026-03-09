@@ -1,1 +1,9 @@
-.env*
+# env files
+*.env
+
+# node modules
+node_modules/
+Backend/node_modules/
+
+# logs
+*.log
