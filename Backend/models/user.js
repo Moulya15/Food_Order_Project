@@ -53,3 +53,8 @@ const userSchema= mongoose.Schema({
 }, {timeStamps:true})
 
 //this will run automatically before saving the username
+userSchema.pre("save", async function(){
+    if(!this.isModified("password")) return;//this will check the password attribute in the table, so when a user enters the pw, the password field is modified so !(true), therefore it is false, now the pw will get hashed
+    this.password = await bcrpt.hash(this.password,12);
+    this.passwordConfirm=undefined;
+})
