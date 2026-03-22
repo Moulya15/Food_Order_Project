@@ -1,0 +1,1 @@
+This folder Stores configuration settings (DB connection, environment variables, app constants).

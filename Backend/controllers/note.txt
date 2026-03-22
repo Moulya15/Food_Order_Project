@@ -1,0 +1,1 @@
+controllers → Handles request logic and sends responses (connects routes with business logic).

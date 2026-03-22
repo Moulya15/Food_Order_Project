@@ -1,0 +1,1 @@
+models → Defines data structure and interacts with the database (schemas, queries).

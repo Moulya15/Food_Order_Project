@@ -1,0 +1,1 @@
+middleware → Functions that run before controllers to process requests (auth, logging, validation).
