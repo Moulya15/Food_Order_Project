@@ -18,7 +18,6 @@ const app= express();//this will control entire app
 
 //import middleware packages
 const cors=require('cors');
-const badyParser= require('body-parser');
 const bodyParser = require('body-parser');
 
 //middleware is the function the runs between request and response
