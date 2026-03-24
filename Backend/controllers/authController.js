@@ -30,10 +30,10 @@ sendToken(user,200,res);
 });
 
 //login 
-exports.login= catchAsyncErrors (async (res,req,next)=>{
+exports.login= catchAsyncErrors (async (req, res, next)=>{
     const {email,password} = req.body;
 
-    if(!mail || !password){
+    if(!email || !password){
         return next(new ErrorHandler("Please enter Correct Mail or Password", 400))
     }
     const user=await User.findOne({email}).select("+password");
@@ -41,7 +41,7 @@ exports.login= catchAsyncErrors (async (res,req,next)=>{
     if(!user){
         return next(new ErrorHandler("Invalid Email or Password", 401));
     }
-    const isPasswordMatched= await User.correctPassword(password,user.password);
+    const isPasswordMatched= await user.correctPassword(password,user.password);
 
     if(!isPasswordMatched){
         return next(new ErrorHandler("Invalid Password",401))

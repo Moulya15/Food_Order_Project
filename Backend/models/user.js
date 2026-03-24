@@ -67,7 +67,7 @@ userSchema.methods.getJWTToken=function(){
 }
 
 //compare password during login
-userSchema.methods.compare=async function(candidatePassword, userPassword){
+userSchema.methods.correctPassword=async function(candidatePassword, userPassword){
 return await bcrpt.compare(candidatePassword, userPassword)
 };
 
