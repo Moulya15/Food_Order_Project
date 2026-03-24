@@ -66,4 +66,9 @@ userSchema.methods.getJWTToken=function(){
     return jwt.sign({ id:this._id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRES_TIME})
 }
 
+//compare password during login
+userSchema.methods.compare=async function(candidatePassword, userPassword){
+return await bcrpt.compare(candidatePassword, userPassword)
+};
+
 module.exports=mongoose.model("User", userSchema);
