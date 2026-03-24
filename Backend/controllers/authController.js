@@ -49,3 +49,16 @@ exports.login= catchAsyncErrors (async (req, res, next)=>{
 
     sendToken(user,200,res);
 })
+
+exports.logout= catchAsyncErrors(async(req,res,next)=>{
+//after logout we need to remove the cookie
+res.cookie("jwt", null, {
+    expires: new Date(Date.now()),
+    httpOnly:true
+});
+
+res.status(200).json({
+    success:true,
+    message:"Logged out successfully"
+})
+})
