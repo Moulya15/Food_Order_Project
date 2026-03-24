@@ -59,3 +59,11 @@ userSchema.pre("save", async function(){
     this.password = await bcrpt.hash(this.password,12);
     this.passwordConfirm=undefined;
 })
+
+//create JWT Token
+userSchema.methods.getJWTToken=function(){
+    //is is ngt but in mongo for everthing it will create id so that is what we are reffering here
+    return jwt.sign({ id:this._id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRES_TIME})
+}
+
+module.exports=mongoose.model("User", userSchema);

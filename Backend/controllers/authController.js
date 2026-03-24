@@ -1,9 +1,10 @@
 const User=require("../models/user");
 const jwt=require("jsonwebtoken");
 const sendToken = require("../utils/sendToken")
+const catchAsyncErrors=require("../middleware/catchAsyncErrors");
 
 //register user
-exports.signup=async (req,res)=>{
+exports.signup= catchAsyncErrors (async (req,res)=>{
     const {name,phoneNumber,email,password,passwordConfirm}= req.body;
 
 let avatar={};
@@ -22,8 +23,7 @@ name,
 phoneNumber,
 email,
 password,
-passwordConfirm,
-avatar  
+passwordConfirm, 
 });
-send;
-}
+sendToken(user,200,res);
+});

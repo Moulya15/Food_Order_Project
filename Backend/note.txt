@@ -1,0 +1,2 @@
+1. we write  "dev": "nodemon server.js" inside scripts in the package.json because to restart the server everytime when we
+  run the code,  use npm run dev

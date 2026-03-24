@@ -15,6 +15,7 @@ const express= require('express');
 
 // create express application
 const app= express();//this will control entire app 
+const authRoutes=require("./routes/auth")
 
 //import middleware packages
 const cors=require('cors');
@@ -31,8 +32,10 @@ app.use(express.json());//to read json data sent from the client
 app.use(bodyParser.urlencoded({extended:true}));//to read form data sent from frontend
 //the data comes like a sealed envelop so this body parser opens it so that server can read the message
 
-app.get("/",(req,res)=>{
-    res.send("Server is running");
-})
+// app.get("/",(req,res)=>{
+//     res.send("Server is running");
+// })
+
+app.use("/api/user",authRoutes);
 
 module.exports=app;
