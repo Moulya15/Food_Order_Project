@@ -101,6 +101,7 @@ exports.protect = catchAsyncErrors(async (req, res, next) => {
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 //promisify is used to convert callback based function into something that returns a promise, so we can use async/await with it.
+  const currentUser = await User.findById(decoded.id);//this line given by chatgpt
 
   if (!currentUser) {
     return next(
@@ -112,7 +113,8 @@ exports.protect = catchAsyncErrors(async (req, res, next) => {
     return next(
       new ErrorHandler(
         "User recently changed password ! please log in again.",
-        404,
+        401,//chatgpt
+        //401 is unauthorized
       ),
     );
   }
