@@ -7,7 +7,7 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.get("/logout",authController.logout);
 router.post("/forgetPassword", authController.forgotPassword);
-router.patch("/resetPassword",authController.resetPassword);
+router.patch("/resetPassword/:token",authController.resetPassword);
 
 router.get("/me",authController.protect ,authController.getUserProfile);
 router.put("/password/update",

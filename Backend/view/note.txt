@@ -1,0 +1,3 @@
+Pug (previously called Jade) is a template engine that lets you write HTML without all the messy tags.
+
+Instead of writing full HTML, you write a simplified version, and Pug converts it into HTML.

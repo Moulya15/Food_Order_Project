@@ -1,1 +1,12 @@
 controllers → Handles request logic and sends responses (connects routes with business logic).
+
+for testing endpoint like forget password
+we used mailtrap.io to test email
+we created env var for host,password, port(it shoukld be 4 digit because less than that will be disables by firewall)
+so in postman , when we post forgetpassword request along with body{ email }
+we will get the request in the mailtrap.io sandbox
+copy the token
+paste it in the resetpassword api endpoint
+your password will be reset
+again check the login endpoint, it will be a success
+for the mail : test@gmail.com the pw is reset123 not 123456(its for the rest)

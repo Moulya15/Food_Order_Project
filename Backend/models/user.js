@@ -48,9 +48,9 @@ const userSchema= mongoose.Schema({
         url:String,
     },
     passwordChangedAt:Date,
-    passwordRestToken:String,
-    passwordResetExpire:Date,
-}, {timeStamps:true})
+passwordResetToken: String,
+passwordResetExpires: Date,
+}, {timestamps:true})
 
 //this will run automatically before saving the username
 userSchema.pre("save", async function(){

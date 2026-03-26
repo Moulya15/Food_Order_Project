@@ -30,14 +30,18 @@ module.exports = class Email {
   // Create a transporter that connects to the email server
   // This transporter is responsible for actually sending the email
   newTransport() {
+    console.log("HOST:", process.env.EMAIL_HOST);
+console.log("PORT:", process.env.EMAIL_PORT);
+console.log("USER:", process.env.EMAIL_USERNAME);
+console.log("PASS:", process.env.EMAIL_PASSWORD);
 
     // In production we might use services like SendGrid
     // but here we configure a custom SMTP server
 
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-
+      port: Number(process.env.EMAIL_PORT),
+secure: false, // 👈 ADD THIS
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
