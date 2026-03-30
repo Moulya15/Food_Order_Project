@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema({
         required: true,
         ref: 'User',
     },
-    orderItems:[ {
+    orderItems: [{
         name: {
             type: String,
             required: true,
@@ -51,53 +51,53 @@ const orderSchema = new mongoose.Schema({
             required: true,
             ref: 'FoodItem',
         },
-        price:{
+        price: {
             type: Number,
             required: true,
         }
     }
-],
-paymentInfo:{
-    id:{
-        type:String,
+    ],
+    paymentInfo: {
+        id: {
+            type: String,
+        },
+        status: {
+            type: String,
+        }
     },
-    status:{
-        type:String,
+    paidAt: {
+        type: Date,
+    },
+    itemsPrice: {
+        type: Number,
+        required: true,
+        default: 0.0,
+    },
+    taxPrice: {
+        type: Number,
+        default: 0.0,
+    },
+    deliveryCharge: {
+        type: Number,
+        default: 0.0,
+    },
+    finalTotal: {
+        type: Number,
+        required: true,
+        default: 0.0
+    },
+    orderStatus: {
+        type: String,
+        required: true,
+        deafult: 'Processing'
+    },
+    deliveredAt: {
+        type: Date,
+    },
+    createdAt: {
+        type: Date,
+        deafult: Date.now
     }
-},
-paidAt:{
-    type:Date,
-},
-itemsPrice:{
-    type:Number,
-    required:true,
-    default:0.0,
-},
-taxPrice:{
-    type:Number,
-    default:0.0,
-},
-deliveryCharge:{
-    type:Number,
-    default:0.0,
-},
-finalTotal:{
-    type:Number,
-    required:true,
-    default:0.0
-},
-orderStatus:{
-    type:String,
-    required:true,
-    deafult:'Processing'
-},
-deliveredAt:{
-    type:Date,
-},
-createdAt:{
-    type:Date,
-    deafult:Date.now
-}
 })
 
 //stock management
@@ -114,3 +114,24 @@ createdAt:{
 //reduce stock
 //save order
 //return response
+
+orderSchema.pre('save', async function (next) {
+    try {
+        for (const orderItem of this.orderItems) {
+            const foodItem = await mongoose.model('FoodItem').findById(orderItem.foodItem);
+            if (!foodItem) {
+                throw new Error("Food item not found");
+            }
+            if (foodItem.stock < orderItem.quantity) {
+                throw new Error(`Insufficient stock for ${orderItem.name}`)
+            }
+            foodItem.stock - orderItem.quantity;
+            await foodItem.save();
+        }
+        next()
+    } catch (error) {
+        next(error);
+    }
+    })
+
+    module.exports=mongoose.model("Order", orderSchema);
