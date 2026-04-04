@@ -10,7 +10,7 @@ const foodSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, "Please enter FoodItem price"],
-    maxLength: [5, "FoodItem name cannot exceed 5 characters "],
+    maxLength: [5, "FoodItem price cannot exceed 5 characters "],
     default: 0.0,
   },
   description: {

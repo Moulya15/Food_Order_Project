@@ -1,6 +1,6 @@
-const mongoose=requie("mongoose");
+const mongoose=require("mongoose");
 
-const restaurantSchema = new mongoose.schema({
+const restaurantSchema = new mongoose.Schema({
     name:{
         type:String,
         trim:true, // it removes unwanted whitespace
@@ -16,7 +16,7 @@ const restaurantSchema = new mongoose.schema({
         required:[true, "please enter the address"],
     },
     ratings:{
-        typr:Number,
+        type:Number,
         default:0
     },
     Location:{

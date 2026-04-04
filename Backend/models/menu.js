@@ -5,7 +5,7 @@
 
 
 
-const mongoose= require=("mongoose");
+const mongoose= require("mongoose");
 const menuSchema= new mongoose.Schema({
     menu:[{
         category:{type:String, required:true},
@@ -16,7 +16,7 @@ const menuSchema= new mongoose.Schema({
     }],
     restaurant:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:String
+        ref:"Restaurant"
     }
 },
 {

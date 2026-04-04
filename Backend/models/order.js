@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { useReducer } = require('react');
 const orderSchema = new mongoose.Schema({
     deliveryInfo: {
         address: {
@@ -125,7 +124,7 @@ orderSchema.pre('save', async function (next) {
             if (foodItem.stock < orderItem.quantity) {
                 throw new Error(`Insufficient stock for ${orderItem.name}`)
             }
-            foodItem.stock - orderItem.quantity;
+            foodItem.stock -= orderItem.quantity;
             await foodItem.save();
         }
         next()

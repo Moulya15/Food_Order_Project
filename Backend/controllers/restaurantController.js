@@ -4,12 +4,14 @@ const catchAsyncErrors =require("../middleware/catchAsyncErrors")
 const APIFeatures=require("../utils/apiFeatures");
 
 //fetch restaurant
-exports.getAllRestaurant=catchAsyncErrors(async(req,res,next)=>{
+exports.getAllRestaurants=catchAsyncErrors(async(req,res)=>{
+    console.log("API HIT");  // 👈 ADD THIS
+
     const apiFeatures= new APIFeatures(Restaurant.find(),req.query)
     .search()
     .sort()
 
-    const restaurants=await apiFeatures.query();
+    const restaurants=await apiFeatures.query;
     res.status(200).json({
         status:"success",
         count:restaurants.length,

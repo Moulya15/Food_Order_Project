@@ -2,7 +2,7 @@ const Menu = require("../models/menu");
 const ErrorHandler=require("../utils/errorHandler");
 const catchAsyncErrors=require("../middleware/catchAsyncErrors");
 
-exports.getAllMenu= catchAsyncErrors(async(req,res,next)=>{
+exports.getAllMenus= catchAsyncErrors(async(req,res,next)=>{
     //filter logic
     ////2 cases 1. restaurant exist -> show particular menu
         //   2. restaurant doesn't exist -> show all menu
