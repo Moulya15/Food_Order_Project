@@ -9,7 +9,7 @@ exports.getAllMenus= catchAsyncErrors(async(req,res,next)=>{
     const filter= req.params.storeId ? {restaurant:req.params.storeId} : {};
 
     //fetch data from database
-    const menu= await Menu.filter(filter).populate("menu-items");
+    const menu= await Menu.find(filter).populate("menu.items");
     //populate replace id with full data
     //without populate:
 // items: [id1,id2]
@@ -42,7 +42,7 @@ res.status(204).json({status:"success"})
 
 //add items into menu
 exports.addItemsToMenu = catchAsyncErrors(async(req, res, next)=>{
-const {category, items} = req.body;
+const {category, foodItemId} = req.body;
 const menuId =req.params.menuId;
 if(!menuId) {
 return next(new ErrorHandler("Please provide menuId", 400))

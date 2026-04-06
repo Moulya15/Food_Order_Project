@@ -1,71 +1,197 @@
-const Order=require("../models/order");
-const Cart=require("../models/cartModel");
-const {objectId}= require("mongodb")
-const catchAsyncErrors=require("../middleware/catchAsyncErrors");
-const ErrorHandler=require("../utils/errorHandler");
+// const Order=require("../models/order");
+// const Cart=require("../models/cartModel");
+// const {objectId}= require("mongodb")
+// const catchAsyncErrors=require("../middleware/catchAsyncErrors");
+// const ErrorHandler=require("../utils/errorHandler");
 
-//get single order => /api/v1/order/:id
-//1.get order ID from url
-//2. find order in database usinh order id
-//3. if order is not found , return error response
-//4. if order is found, return order details in response
+// //get single order => /api/v1/order/:id
+// //1.get order ID from url
+// //2. find order in database usinh order id
+// //3. if order is not found , return error response
+// //4. if order is found, return order details in response
 
-//populate join data from another collection
+// //populate join data from another collection
 
-exports.getSingleOrder=catchAsyncErrors(async(req,res,next)=>{
-    const order=await Order.findById(req.params.id)
-    .populate("user","name email")
-    .populate(restaurant)
-    .exec()
+// exports.getSingleOrder=catchAsyncErrors(async(req,res,next)=>{
+//     const order=await Order.findById(req.params.id)
+//     .populate("user","name email")
+//     .populate(restaurant)
+//     .exec()
 
-    if(!order){
-        return next(new ErrorHandler("Order not found with this ID",404))
-    }
-    res.status(200).json({
-        success:true.
-        order
+//     if(!order){
+//         return next(new ErrorHandler("Order not found with this ID",404))
+//     }
+//     res.status(200).json({
+//         success:true,
+//         order
+//     })
+// })
+
+// //get logged in user order => /api/v1/orders/me
+// //get loggedin user id
+// //find orders of the user
+// //retuen all orders
+
+// //backend= filtering data based on user
+
+// exports.myOrders=catchAsyncErrors(async(req,res,next)=>{
+//     const userId=new ObjectID(req.user.id);
+//     const orders= await Order.find({user:userId})
+//     .populate("user","name email")
+//     .populate("restaurant")
+//     .exec();
+
+//     res.status(200).json({
+//         success:true,
+//         orders
+//     })
+// })
+
+// //get all orders
+
+// //get all oderser from db
+// //return orders and total revenue
+
+// //backend=data+calculations
+
+// exports.allOrders=catchAsyncErrors(async(req,res,next)=>{
+//     const orders=await Order.find();
+//     let totalAmount=0;
+
+//     orders.forEach((order)=>{
+//         totalAmount+=order.finalTotal
+//     });
+//     res.status(200).json({
+//         success:true,
+//         totalAmount,
+//         orders
+//     })
+
+
+// })
+
+const Order = require("../models/order");
+const FoodItem = require("../models/foodItem");
+const Cart = require("../models/cartModel");
+const { ObjectId } = require("mongodb");
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const dotenv = require("dotenv");
+
+//setting up config file
+dotenv.config({ path: "./config/config.env" });
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+// Create a new order   =>  /api/v1/order/new
+exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+  // console.log("id", req.body);
+  const { session_id } = req.body;
+
+  const session = await stripe.checkout.sessions.retrieve(session_id, {
+    expand: ["customer"],
+  });
+  console.log(session);
+  const cart = await Cart.findOne({ user: req.user._id })
+    .populate({
+      path: "items.foodItem",
+      select: "name price images",
     })
-})
+    .populate({
+      path: "restaurant",
+      select: "name",
+    });
+  console.log(cart);
 
-//get logged in user order => /api/v1/orders/me
-//get loggedin user id
-//find orders of the user
-//retuen all orders
+  let deliveryInfo = {
+    address:
+      session.shipping_details.address.line1 +
+      " " +
+      session.shipping_details.address.line1,
+    city: session.shipping_details.address.city,
+    phoneNo: session.customer_details.phone,
+    postalCode: session.shipping_details.address.postal_code,
+    country: session.shipping_details.address.country,
+  };
+  let orderItems = cart.items.map((item) => ({
+    name: item.foodItem.name,
+    quantity: item.quantity,
+    image: item.foodItem.images[0].url,
+    price: item.foodItem.price,
+    fooditem: item.foodItem._id,
+  }));
 
-//backend= filtering data based on user
+  let paymentInfo = {
+    id: session.payment_intent,
+    status: session.payment_status,
+  };
 
-exports.myOrders=catchAsyncErrors(async(req,res,next)=>{
-    const userId=new ObjectID(req.user.id);
-    const orders= await Order.find({user:userId})
-    .populate("user","name email")
+  const order = await Order.create({
+    orderItems,
+    deliveryInfo,
+    paymentInfo,
+    deliveryCharge: +session.shipping_cost.amount_subtotal / 100,
+    itemsPrice: +session.amount_subtotal / 100,
+    finalTotal: +session.amount_total / 100,
+    user: req.user.id,
+    restaurant: cart.restaurant._id,
+    paidAt: Date.now(),
+  });
+  console.log(order);
+
+  await Cart.findOneAndDelete({ user: req.user._id });
+
+  res.status(200).json({
+    success: true,
+    order,
+  });
+});
+
+// Get single order   =>   /api/v1/orders/:id
+exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id)
+    .populate("user", "name email")
     .populate("restaurant")
     .exec();
 
-    res.status(200).json({
-        success:true,
-        orders
-    })
-})
+  if (!order) {
+    return next(new ErrorHandler("No Order found with this ID", 404));
+  }
 
-//get all orders
+  res.status(200).json({
+    success: true,
+    order,
+  });
+});
 
-//get all oderser from db
-//return orders and total revenue
+// Get logged in user orders   =>   /api/v1/orders/me
+exports.myOrders = catchAsyncErrors(async (req, res, next) => {
+  // Get the user ID from req.user
+  const userId = new ObjectId(req.user.id);
+  // Find orders for the specific user using the retrieved user ID
+  const orders = await Order.find({ user: userId })
+    .populate("user", "name email")
+    .populate("restaurant")
+    .exec();
 
-//backend=data+calculations
+  res.status(200).json({
+    success: true,
+    orders,
+  });
+});
 
-exports.allOrders=catchAsyncErrors(async(req,res,next)=>{
-    const orders=await Order.find();
-    let totalAmount=0;
+// Get all orders - ADMIN  =>   /api/v1/admin/orders/
+exports.allOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find();
 
-    orders.forEach((order)=>{
-        totalAmount+=order.finalTotal
-    });
-    res.status(200).json({
-        success:true,
-        totalAmount,
-        orders
-    })
+  let totalAmount = 0;
 
+  orders.forEach((order) => {
+    totalAmount += order.finalTotal;
+  });
 
-})
+  res.status(200).json({
+    success: true,
+    totalAmount,
+    orders,
+  });
+});

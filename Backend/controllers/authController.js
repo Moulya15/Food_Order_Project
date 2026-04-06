@@ -7,6 +7,7 @@ const ErrorHandler=require("../utils/errorHandler");
 const crypto = require("crypto");
 const { promisify } = require("util");
 const Email = require("../utils/email");
+const cloudinary = require("../config/cloudinary");
 
 //register user
 exports.signup= catchAsyncErrors (async (req,res)=>{
@@ -14,14 +15,26 @@ exports.signup= catchAsyncErrors (async (req,res)=>{
 
 let avatar={};
 
-//if avatar is not available or default avatar
-// if(!req.body.avatar || req.body.avatar==="/images/images.png"){
-//     avatar={
-//         public_id:"default",
-//         url:"/images/images.png"
+if (!req.body.avatar || req.body.avatar === "/images/images.png") {
 
-//     };
-// }
+    avatar = {
+      public_id: "default",
+      url: "/images/images.png",
+    };
+
+  } else {
+
+    const result = await cloudinary.uploader.upload(req.body.avatar, {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    });
+
+    avatar = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+  }
 
 const user= await User.create({
 name,
@@ -29,6 +42,7 @@ phoneNumber,
 email,
 password,
 passwordConfirm, 
+avatar,
 });
 sendToken(user,200,res);
 });
@@ -209,4 +223,43 @@ console.log("Hashed token:", hashedToken);
   await user.save();
 
   sendToken(user, 200, res);
+});
+
+// Update Profile
+exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  if (req.body.avatar !== "") {
+
+    const user = await User.findById(req.user.id);
+
+    const image_id = user.avatar.public_id;
+
+    await cloudinary.uploader.destroy(image_id);
+
+    const result = await cloudinary.uploader.upload(req.body.avatar, {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    });
+
+    newUserData.avatar = {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+  }
+
+  await User.findByIdAndUpdate(req.user.id, newUserData, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+  });
+
 });

@@ -19,7 +19,11 @@ const restaurantSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
-    Location:{
+    numOfReviews: {
+    type: Number,
+    default: 0,
+  },
+    location:{
        type: {type:String,
         enum:["Point"],
         required:[true]
@@ -38,7 +42,7 @@ const restaurantSchema = new mongoose.Schema({
             type:Number,
             required:true,
         },
-        comment:{
+        Comment:{
             type:String,
             required:true
         },

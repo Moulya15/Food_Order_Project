@@ -18,7 +18,6 @@ router
   .get(getAllRestaurants)
   .post(protect, authorizeRoles("admin"), createRestaurant);
 
-  
 router
   .route("/:storeId")
   .get(getRestaurant)

@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema({
         required: true,
         ref: 'Restaurant',
     },
-    useReducer: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User',
@@ -88,14 +88,14 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required: true,
-        deafult: 'Processing'
+        default: 'Processing'
     },
     deliveredAt: {
         type: Date,
     },
     createdAt: {
         type: Date,
-        deafult: Date.now
+        default: Date.now
     }
 })
 

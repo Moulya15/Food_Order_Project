@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 //create new schema
-const userSchema= mongoose.Schema({
+const userSchema= new mongoose.Schema({
     name:{
         type:String,
         required:[true, "Please enter your name"],
@@ -53,12 +53,15 @@ passwordResetExpires: Date,
 }, {timestamps:true})
 
 //this will run automatically before saving the username
-userSchema.pre("save", async function(){
-    if(!this.isModified("password")) return;//this will check the password attribute in the table, so when a user enters the pw,
-    //  the password field is modified so !(true), therefore it is false, now the pw will get hashed
-    this.password = await bcrypt.hash(this.password,12);
-    this.passwordConfirm=undefined;
-})
+// HASH PASSWORD
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+
+  next();
+});
 
 //create JWT Token
 userSchema.methods.getJWTToken=function(){
