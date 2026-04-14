@@ -80,16 +80,16 @@ const dotenv = require("dotenv");
 
 //setting up config file
 dotenv.config({ path: "./config/config.env" });
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Create a new order   =>  /api/v1/order/new
 exports.newOrder = catchAsyncErrors(async (req, res, next) => {
   // console.log("id", req.body);
   const { session_id } = req.body;
 
-  const session = await stripe.checkout.sessions.retrieve(session_id, {
-    expand: ["customer"],
-  });
+//   const session = await stripe.checkout.sessions.retrieve(session_id, {
+//     expand: ["customer"],
+//   });
   console.log(session);
   const cart = await Cart.findOne({ user: req.user._id })
     .populate({

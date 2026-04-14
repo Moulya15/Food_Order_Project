@@ -9,7 +9,7 @@ const {
 } = require("../controllers/paymentController");
 
 router.route("/payment/process").post(authController.protect, processPayment);
-router.route("/stripeapi").get(authController.protect, sendStripApi);
+// router.route("/stripeapi").get(authController.protect, sendStripApi);
 // router.route("/retrieveUser").get(paymentDetails);
 
 module.exports = router;
